@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 
-# Positions des équipements
 nodes = {
     "RT-1": (0, 4),
     "FW-1": (0, 2.9),
@@ -14,7 +13,6 @@ nodes = {
     "SRV-1": (3, 0)
 }
 
-# Liaisons : (source, destination, anomalie ?)
 edges = [
     ("RT-1", "FW-1", False),
     ("FW-1", "SW-1", False),
@@ -22,13 +20,12 @@ edges = [
     ("SW-1", "SW-3", False),
     ("SW-2", "PC-1", False),
     ("SW-2", "PC-2", True),
-    ("SW-3", "PC-3", True), #Anomalie
+    ("SW-3", "PC-3", True),
     ("SW-3", "SRV-1", False),
     ("SW-2", "SRV-1", True),
     ("SW-3", "PC-1", True),
 ]
 
-# Couleurs simples par type
 colors = {
     "RT": "lightgreen",
     "FW": "orange",
@@ -72,13 +69,11 @@ for name, (x, y) in nodes.items():
     ax.scatter(x, y, s=900, color=c, edgecolors="black", zorder=3)
     ax.text(x, y, name, ha="center", va="center", fontsize=9, weight="bold")
 
-# --- AJOUT : Encerclement automatique des équipements non connectés ---
 for node in unconnected_nodes:
     x, y = nodes[node]
     circle = plt.Circle((x, y), 0.4, color="red", fill=False, linestyle="dashed", linewidth=2)
     ax.add_patch(circle)
 
-# --- AJOUT : Affichage du compteur détaillé sur le graphique ---
 ax.text(0, 0.90,
         f"Anomalies détectées : {nb_anomalies}\n(Liaisons : {nb_anomalies_edges}, Matériel : {nb_anomalies_nodes})",
         transform=ax.transAxes,
