@@ -1,4 +1,7 @@
 import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+from matplotlib import patches
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 
 nodes = {
     "RT-1": (0, 4),
@@ -34,6 +37,14 @@ colors = {
     "SRV": "violet"
 }
 
+img_path = {
+    "RT": "./images/router.png",
+    "FW": "./images/firewall.png",
+    "SW": "./images/switch.png",
+    "PC": "./images/computer.png",
+    "SRV": "./images/server.png"
+}
+
 connected_nodes = set()
 for a, b, _ in edges:
     connected_nodes.add(a)
@@ -44,7 +55,7 @@ nb_anomalies_edges = sum(1 for edge in edges if edge[2])
 nb_anomalies_nodes = len(unconnected_nodes)
 nb_anomalies = nb_anomalies_edges + nb_anomalies_nodes
 
-fig, ax = plt.subplots(figsize=(8, 6))
+fig, ax = plt.subplots(figsize=(10, 8))
 
 for a, b, anomalie in edges:
     x1, y1 = nodes[a]
@@ -57,21 +68,41 @@ for a, b, anomalie in edges:
 for name, (x, y) in nodes.items():
     if name.startswith("RT"):
         c = colors["RT"]
+        img = mpimg.imread(img_path["RT"])
+        img_box = OffsetImage(img, zoom=0.23)
+        ab = AnnotationBbox(img_box, (x, y - 0.13), zorder=4, frameon=False)
+        ax.add_artist(ab)
     elif name.startswith("FW"):
         c = colors["FW"]
+        img = mpimg.imread(img_path["FW"])
+        img_box = OffsetImage(img, zoom=0.23)
+        ab = AnnotationBbox(img_box, (x, y - 0.13), zorder=4, frameon=False)
+        ax.add_artist(ab)
     elif name.startswith("SW"):
         c = colors["SW"]
+        img = mpimg.imread(img_path["SW"])
+        img_box = OffsetImage(img, zoom=0.23)
+        ab = AnnotationBbox(img_box, (x, y - 0.13), zorder=4, frameon=False)
+        ax.add_artist(ab)
     elif name.startswith("SRV"):
         c = colors["SRV"]
+        img = mpimg.imread(img_path["SRV"])
+        img_box = OffsetImage(img, zoom=0.23)
+        ab = AnnotationBbox(img_box, (x, y - 0.13), zorder=4, frameon=False)
+        ax.add_artist(ab)
     else:
         c = colors["PC"]
+        img = mpimg.imread(img_path["PC"])
+        img_box = OffsetImage(img, zoom=0.23)
+        ab = AnnotationBbox(img_box, (x, y - 0.13), zorder=4, frameon=False)
+        ax.add_artist(ab)
 
-    ax.scatter(x, y, s=900, color=c, edgecolors="black", zorder=3)
-    ax.text(x, y, name, ha="center", va="center", fontsize=9, weight="bold")
+    ax.scatter(x, y, s=2300, color=c, edgecolors="black", zorder=3)
+    ax.text(x, y + 0.1, name, ha="center", va="center", fontsize=9, weight="bold")
 
 for node in unconnected_nodes:
     x, y = nodes[node]
-    circle = plt.Circle((x, y), 0.4, color="red", fill=False, linestyle="dashed", linewidth=2)
+    circle = plt.Circle((x, y), 0.5, color="red", fill=False, linestyle="dashed", linewidth=2)
     ax.add_patch(circle)
 
 ax.text(0, 0.90,
