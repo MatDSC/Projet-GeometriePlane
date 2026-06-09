@@ -25,17 +25,18 @@ nodes = {
 }
 
 edges = [
-    ("RT-1", "FW-1", False),
-    ("FW-1", "SW-1", False),
-    ("SW-1", "SW-2", False),
-    ("SW-1", "SW-3", False),
-    ("SW-2", "PC-1", False),
-    ("SW-2", "PC-2", True),
-    ("SW-3", "PC-3", True),
-    ("SW-3", "SRV-1", False),
-    ("SW-2", "SRV-1", True),
-    ("SW-3", "PC-1", True),
+    ("RT-1", "FW-1"),
+    ("FW-1", "SW-1"),
+    ("SW-1", "SW-2"),
+    ("SW-1", "SW-3"),
+    ("SW-2", "PC-1"),
+    ("SW-2", "PC-2"),
+    ("SW-3", "PC-3"),
+    ("SW-3", "SRV-1"),
+    ("SW-2", "SRV-1"),
+    ("SW-3", "PC-1",),
 ]
+
 
 PALETTE = {
     "RT": "#9be7a3",
@@ -46,11 +47,12 @@ PALETTE = {
 }
 
 MARKER_BY_TYPE = {
-    "RT": ("s", 3800),
+    # o = circle, v = triangle, s = square, D = rhombus, h = hexagon
+    "RT": ("o", 3800),
     "FW": ("v", 3000),
-    "SW": ("o", 2600),
-    "PC": ("D", 2200),
-    "SRV": ("", 2800),
+    "SW": ("s", 2600),
+    "PC": ("D", 2000),
+    "SRV": ("h", 2800),
 }
 
 IMG_PATH = {
@@ -95,28 +97,38 @@ def segment_intersection(p1, p2, p3, p4):
 
 
 def build_plot(save_path: str | None = None):
-    connected_nodes = {a for a, b, _ in edges} | {b for a, b, _ in edges}
+    connected_nodes = {a for a, b in edges} | {b for a, b in edges}
     unconnected_nodes = [n for n in nodes if n not in connected_nodes]
 
-    nb_anomalies_edges = sum(1 for _, _, a in edges if a)
+    # automatic detection for cross network edges
+    crossing_indices = set()
+    for i, (a1, b1 ) in enumerate(edges):
+        for j, (a2, b2 ) in enumerate(edges[i + 1:], start=i + 1):
+            if len({a1, b1, a2, b2}) < 4:
+                continue
+            if segment_intersection(nodes[a1], nodes[b1], nodes[a2], nodes[b2]):
+                crossing_indices.add(i)
+                crossing_indices.add(j)
+
+    nb_anomalies_edges = len(crossing_indices)
     nb_anomalies_nodes = len(unconnected_nodes)
     nb_anomalies = nb_anomalies_edges + nb_anomalies_nodes
 
     fig, ax = plt.subplots(figsize=(10, 8))
 
-    # draw edges
-    for a, b, anomalie in edges:
+    # draw edges between nodes
+    for i, (a, b) in enumerate(edges):
         x1, y1 = nodes[a]
         x2, y2 = nodes[b]
-        if anomalie:
+        if i in crossing_indices:
             ax.plot([x1, x2], [y1, y2], "r--", linewidth=2, zorder=1)
         else:
             ax.plot([x1, x2], [y1, y2], color="#333333", linewidth=2, zorder=1)
 
     # mark line intersections with crosses
     intersections = []
-    for i, (a1, b1, _) in enumerate(edges):
-        for a2, b2, _ in edges[i + 1:]:
+    for i, (a1, b1) in enumerate(edges):
+        for a2, b2 in edges[i + 1:]:
             if len({a1, b1, a2, b2}) < 4:
                 continue
             point = segment_intersection(nodes[a1], nodes[b1], nodes[a2], nodes[b2])
