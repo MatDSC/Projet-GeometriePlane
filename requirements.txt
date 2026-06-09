@@ -1,0 +1,2 @@
+matplotlib==3.10.7
+mplcursors==0.7.1
