@@ -10,7 +10,9 @@ try:
 except Exception:
     HAS_MPLCURSORS = False
 
-# --- Data ------------------------------------------------------------------
+# --- DATA ------------------------------------------------------------------
+filename = "./var/schema/network_visualization.png"
+
 nodes = {
     "RT-1": (0, 4),
     "FW-1": (0, 2.9),
@@ -35,6 +37,7 @@ edges = [
     ("SW-3", "SRV-1"),
     ("SW-2", "SRV-1"),
     ("SW-3", "PC-1",),
+    ("SW-3", "SW-2"),
 ]
 
 
@@ -62,7 +65,7 @@ IMG_PATH = {
     "PC": "./images/computer.png",
     "SRV": "./images/server.png",
 }
-
+# --- END OF DATA -------------------------------------------------------------
 
 def node_type(name: str) -> str:
     return name.split("-")[0]
@@ -216,7 +219,7 @@ def build_plot(save_path: str | None = None):
     plt.show()
 
 
-if __name__ == "__main__":
-    dirpath = os.path.dirname(__file__)
-    save_file = os.path.join(dirpath, "network_visualization.png")
-    build_plot(save_path=save_file)
+# if __name__ == "__main__":
+dirpath = os.path.dirname(__file__)
+save_file = os.path.join(dirpath, filename)
+build_plot(save_path=save_file)
